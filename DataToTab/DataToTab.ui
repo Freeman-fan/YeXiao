@@ -11,7 +11,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>表格创建器</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -127,7 +127,14 @@ li.checked::marker { content: &quot;\2612&quot;; }
           <item>
            <widget class="QPushButton" name="btn_Save">
             <property name="text">
-             <string>输出结果</string>
+             <string>输出重量表</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btn_PrintTab">
+            <property name="text">
+             <string>输出标签表</string>
             </property>
            </widget>
           </item>

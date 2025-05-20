@@ -1,4 +1,4 @@
-# Form implementation generated from reading ui file 'd:\Onedrive\CodeS\Python\YeXiao\DataToTab.ui'
+# Form implementation generated from reading ui file 'd:\Onedrive\CodeS\Python\YeXiaoTools\DataToTab\DataToTab.ui'
 #
 # Created by: PyQt6 UI code generator 6.7.1
 #
@@ -69,6 +69,9 @@ class Ui_MainWindow(object):
         self.btn_Save = QtWidgets.QPushButton(parent=self.tab_2)
         self.btn_Save.setObjectName("btn_Save")
         self.verticalLayout_3.addWidget(self.btn_Save)
+        self.btn_PrintTab = QtWidgets.QPushButton(parent=self.tab_2)
+        self.btn_PrintTab.setObjectName("btn_PrintTab")
+        self.verticalLayout_3.addWidget(self.btn_PrintTab)
         spacerItem1 = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Policy.Minimum, QtWidgets.QSizePolicy.Policy.Expanding)
         self.verticalLayout_3.addItem(spacerItem1)
         self.horizontalLayout_3.addLayout(self.verticalLayout_3)
@@ -82,7 +85,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "表格创建器"))
         self.textEdit.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -105,5 +108,6 @@ class Ui_MainWindow(object):
         self.btn_AddLine.setText(_translate("MainWindow", "新增一行"))
         self.btn_DelLine.setText(_translate("MainWindow", "删除一行"))
         self.btn_ReSplit.setText(_translate("MainWindow", "重新拆分"))
-        self.btn_Save.setText(_translate("MainWindow", "输出结果"))
+        self.btn_Save.setText(_translate("MainWindow", "输出重量表"))
+        self.btn_PrintTab.setText(_translate("MainWindow", "输出标签表"))
         self.tabWidget.setTabText(self.tabWidget.indexOf(self.tab_2), _translate("MainWindow", "转换结果"))

@@ -4,11 +4,10 @@ import pandas as pd
 from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 from PyQt6.QtCore import Qt
-from Ui_DataToTab import *
-from Ui_DataToTab_ReSplitDialog import *
+from DataToTab_ui import Ui_MainWindow
+from DataToTab_ReSplitDialog_ui import Ui_Dialog
 from openpyxl import load_workbook
 from openpyxl.utils import get_column_letter
-from openpyxl import Workbook
 from openpyxl.styles import Alignment
 from openpyxl.styles.borders import Border, Side
 from openpyxl.styles import Font
@@ -51,6 +50,7 @@ class MainWindows(QMainWindow, Ui_MainWindow):
         self.btn_DelLine.clicked.connect(self.DelLine)
         self.btn_ReSplit.clicked.connect(self.ReSplit)
         self.btn_Save.clicked.connect(self.SaveFile)
+        self.btn_PrintTab.clicked.connect(self.PrintTab)
 
         # 初始化窗口
 
@@ -111,21 +111,16 @@ class MainWindows(QMainWindow, Ui_MainWindow):
     def SaveFile(self):
         file_path = None
         try:
-            file_dialog = QFileDialog()
-            file_dialog.setNameFilter("CSV文件(*.csv);;Excel文件(*.xlsx);;所有格式(*)")
-            if file_dialog.exec():
-                file_path = file_dialog.selectedFiles()[0]
-                name_filter = file_dialog.selectedNameFilter()
-                if 'Excel' in name_filter:
-                    #保存为Excel
-                    if not file_path.endswith('.xlsx'):
-                        file_path += '.xlsx'
-                else:
-                    #保存为CSV
-                    if not file_path.endswith(".csv"):
-                        file_path += ".csv"
+            file_path, _ = QFileDialog.getSaveFileName(
+                self, "保存文件", "", "Excel文件(*.xlsx);;CSV文件(*.csv);;所有格式(*)"
+            )
+            if not file_path:
+                return
+            else:
                 try:
-                    with open(file_path, "w", newline="", encoding="utf-8-sig") as csvfile:
+                    with open(
+                        file_path, "w", newline="", encoding="utf-8-sig"
+                    ) as csvfile:
                         csvwriter = csv.writer(csvfile)
                         for i in range(self.tableWidget.rowCount()):
                             csvwriter.writerow(
@@ -146,32 +141,32 @@ class MainWindows(QMainWindow, Ui_MainWindow):
                                 ]
                             )
                 except Exception as e:
-                    QMessageBox.warning(self, '错误', str(e))
-                if 'Excel' in name_filter:
+                    QMessageBox.warning(self, "错误", str(e))
+                if ".xlsx" in file_path:
                     df = pd.read_csv(file_path)
                     df.to_excel(file_path, index=False)
-                    #调整格式
+                    # 调整格式
                     wb = load_workbook(file_path)
                     ws = wb.active
                     ws.column_dimensions[get_column_letter(1)].width = 14
                     ws.column_dimensions[get_column_letter(2)].width = 8.38
                     # 描边
                     border_style = Border(
-                        left=Side(border_style='thin'),
-                        right=Side(border_style='thin'),
-                        top=Side(border_style='thin'),
-                        bottom=Side(border_style='thin')
+                        left=Side(border_style="thin"),
+                        right=Side(border_style="thin"),
+                        top=Side(border_style="thin"),
+                        bottom=Side(border_style="thin"),
                     )
                     # 字体
                     font_style = Font(
-                        name='宋体',
+                        name="宋体",
                         size=11,
                         bold=False,
                         italic=False,
-                        vertAlign='none',
-                        underline='none',
+                        vertAlign="none",
+                        underline="none",
                         strike=False,
-                        color="000000"
+                        color="000000",
                     )
                     row = 1
                     empty_block = 0
@@ -186,14 +181,61 @@ class MainWindows(QMainWindow, Ui_MainWindow):
                         else:
                             ws.cell(row=row, column=col).border = border_style
                             ws.cell(row=row, column=col).alignment = Alignment(
-                                horizontal='center', vertical='center')
-                            ws.cell(row=row, column=col+1).border = border_style
+                                horizontal="center", vertical="center"
+                            )
+                            ws.cell(row=row, column=col + 1).border = border_style
                             ws.cell(row=row, column=col).font = font_style
-                            ws.cell(row=row, column=col+1).font = font_style
+                            ws.cell(row=row, column=col + 1).font = font_style
                             empty_block = 0
                             row += 1
                     wb.save(file_path)
-                        
+
+        except Exception as e:
+            QMessageBox.warning(self, "错误", str(e))
+
+    def PrintTab(self):
+        """输出标签表"""
+        ignores = QInputDialog.getText(self, "忽略cn", "请输入忽略cn(以逗号“，”分隔):")
+        if ignores[1]:
+            ignores = ignores[0].split("，")
+        else:
+            return
+        print(ignores)
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "保存文件", "", "Excel文件(*.xlsx)"
+        )
+        if not file_path:
+            return
+        # 创建标签表
+        tablist = [["m码", "cn"]]
+        try:
+            for i in range(self.tableWidget.rowCount()):
+                if self.tableWidget.item(i, 0).text() != "":
+                    m_rate = self.tableWidget.item(i, 0).text()
+                    cn = self.tableWidget.item(i, 1).text()
+                    if cn not in ignores:
+                        tablist.append([m_rate, cn])
+                    if self.tableWidget.item(i, 2).text() != "":
+                        cnlist = self.tableWidget.item(i, 2).text().split("，")
+                        for cn in cnlist:
+                            if cn not in ignores:
+                                tablist.append([m_rate, cn])
+        except Exception as e:
+            QMessageBox.warning(self, "错误", str(e))
+        # 输出csv后转为excel并移除csv
+        try:
+            with open(
+                file_path + ".csv", "w", newline="", encoding="utf-8-sig"
+            ) as csvfile:
+                csvwriter = csv.writer(csvfile)
+                for row in tablist:
+                    csvwriter.writerow(row)
+            df = pd.read_csv(file_path + ".csv")
+            df.to_excel(file_path, index=False)
+            # 删除csv
+            import os
+
+            os.remove(file_path + ".csv")
         except Exception as e:
             QMessageBox.warning(self, "错误", str(e))
 
